@@ -18,6 +18,14 @@ public class NotificationLight {
     private LightsManager lightsManager;
     private LightsManager.LightsSession lightsSession;
 
+    // Light type constants (from Android SDK)
+    private static final int LIGHT_TYPE_MICROPHONE = 8;
+    private static final int LIGHT_TYPE_CAMERA = 7;
+    private static final int LIGHT_TYPE_NOTIFICATION = 4;
+    private static final int LIGHT_TYPE_ATTENTION = 5;
+    private static final int LIGHT_TYPE_INPUT = 9;
+    private static final int LIGHT_TYPE_PLAYER_ID = 10;
+
     public NotificationLight(Context context) {
         this.context = context;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -83,7 +91,7 @@ public class NotificationLight {
         // Find notification light (or use the first available light)
         Light targetLight = null;
         for (Light light : lights) {
-            if (light.getType() == Light.LIGHT_TYPE_NOTIFICATION) {
+            if (light.getType() == LIGHT_TYPE_NOTIFICATION) {
                 targetLight = light;
                 Logger.info(TAG, "Using notification light");
                 break;
@@ -93,7 +101,7 @@ public class NotificationLight {
         // If no notification light found, try other types
         if (targetLight == null) {
             for (Light light : lights) {
-                if (light.getType() == Light.LIGHT_TYPE_ATTENTION) {
+                if (light.getType() == LIGHT_TYPE_ATTENTION) {
                     targetLight = light;
                     Logger.info(TAG, "Using attention light");
                     break;
@@ -150,24 +158,21 @@ public class NotificationLight {
     }
 
     private String getLightTypeName(int type) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            switch (type) {
-                case Light.LIGHT_TYPE_MICROPHONE:
-                    return "MICROPHONE";
-                case Light.LIGHT_TYPE_CAMERA:
-                    return "CAMERA";
-                case Light.LIGHT_TYPE_NOTIFICATION:
-                    return "NOTIFICATION";
-                case Light.LIGHT_TYPE_ATTENTION:
-                    return "ATTENTION";
-                case Light.LIGHT_TYPE_INPUT:
-                    return "INPUT";
-                case Light.LIGHT_TYPE_PLAYER_ID:
-                    return "PLAYER_ID";
-                default:
-                    return "UNKNOWN(" + type + ")";
-            }
+        switch (type) {
+            case LIGHT_TYPE_MICROPHONE:
+                return "MICROPHONE";
+            case LIGHT_TYPE_CAMERA:
+                return "CAMERA";
+            case LIGHT_TYPE_NOTIFICATION:
+                return "NOTIFICATION";
+            case LIGHT_TYPE_ATTENTION:
+                return "ATTENTION";
+            case LIGHT_TYPE_INPUT:
+                return "INPUT";
+            case LIGHT_TYPE_PLAYER_ID:
+                return "PLAYER_ID";
+            default:
+                return "UNKNOWN(" + type + ")";
         }
-        return "UNKNOWN";
     }
 }
