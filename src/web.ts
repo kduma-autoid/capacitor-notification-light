@@ -1,10 +1,22 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { NotificationLightPlugin } from './definitions';
+import type { NotificationLightPlugin, NotificationLightOptions } from './definitions';
 
 export class NotificationLightWeb extends WebPlugin implements NotificationLightPlugin {
   async echo(options: { value: string }): Promise<{ value: string }> {
     console.log('ECHO', options);
     return options;
+  }
+
+  async showNotificationWithLight(_options: NotificationLightOptions): Promise<void> {
+    throw this.unimplemented('LED notification control is only available on Android devices');
+  }
+
+  async cancelNotification(_options: { notificationId: number }): Promise<void> {
+    throw this.unimplemented('Notification cancellation is only available on Android devices');
+  }
+
+  async clearAllNotifications(): Promise<void> {
+    throw this.unimplemented('Notification clearing is only available on Android devices');
   }
 }
