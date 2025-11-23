@@ -95,6 +95,31 @@ For devices below Android O (API level 26), the plugin falls back to the legacy 
 - **Android Version**: Notification Channels are supported on Android 8.0 (API level 26) and above. Legacy LED API is used for older versions.
 - **Channel Configuration**: Once a notification channel is created, its LED settings are cached. To change LED settings, you must use a different channel ID or clear the app data.
 - **Permissions**: The plugin requires notification permissions on Android 13+ (automatically handled by Capacitor).
+- **Importance Level**: The plugin uses `IMPORTANCE_HIGH` which is required for LED to work on Android 8.0+.
+
+## Troubleshooting
+
+### LED not working?
+
+1. **Clear App Data**: If you've changed LED settings in your code, you MUST either:
+   - Clear app data: Settings → Apps → Your App → Storage → Clear Data
+   - Uninstall and reinstall the app
+   - Use a different `channelId` for each test
+
+2. **Check Device Settings**:
+   - Go to Settings → Apps → Your App → Notifications
+   - Make sure notifications are enabled
+   - Check the specific channel and ensure "Blink light" is enabled
+   - Disable "Do Not Disturb" mode
+
+3. **Verify Hardware Support**:
+   - Many modern devices (2018+) have removed the LED
+   - Test on older devices (Samsung Galaxy S7, S8, S9, Nexus 5X, etc.)
+   - Devices with Always-On Display (AOD) often lack LEDs
+
+4. **Screen Must Be Off**: The LED typically only shows when the screen is off and the device is locked
+
+5. **Check Notification Arrives**: Verify the notification appears in the notification shade - if no notification shows, there's a permission or code issue
 
 ## Supported LED Colors
 
