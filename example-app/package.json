@@ -11,7 +11,8 @@
     "start": "vite",
     "build": "vite build",
     "build:android": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap-config": "trapeze run config.yaml"
   },
   "dependencies": {
     "@capacitor/core": "latest",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "latest",
+    "@trapezedev/configure": "^7.0.10",
     "vite": "^5.4.2"
   },
   "author": "",
