@@ -14,6 +14,7 @@ window.checkLedAvailability = async () => {
     if (result.available) {
       statusText += `Number of Lights: ${result.lightsCount}\n`;
       statusText += `Light Types: ${result.lightTypes?.join(', ') || 'N/A'}\n`;
+      statusText += '\nUsing LightsManager API (Android 12+)';
     } else {
       statusText += '\nNote: This plugin requires Android 12 (API 31) or higher.\n';
       statusText += 'Not all devices have notification LEDs.';

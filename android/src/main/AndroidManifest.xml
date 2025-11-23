@@ -1,2 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required for controlling device lights using LightsManager API (Android 12+) -->
+    <!-- Note: This is a signature|privileged permission - only system apps or apps with special permissions can use it -->
+    <uses-permission android:name="android.permission.CONTROL_DEVICE_LIGHTS" />
 </manifest>
