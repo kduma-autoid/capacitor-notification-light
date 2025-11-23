@@ -223,7 +223,11 @@ isLedSupported() => Promise<{ supported: boolean }>
 
 Check if the device supports notification LED
 
-**Important:** There is no reliable Android API to detect LED hardware. This method provides a best-effort estimate based on device manufacturer, model, and Android version. The result should be treated as a hint, not a guarantee.
+**Detection Method:**
+- **Android 12+ (API 31+):** Uses the `LightsManager` API to accurately detect notification LED hardware
+- **Older Android versions:** Uses heuristic based on device manufacturer, model, and Android version
+
+**Note:** On Android 12+, this provides accurate hardware detection. On older versions, the result should be treated as a best-effort estimate.
 
 **Returns:** <code>Promise&lt;{ supported: boolean }&gt;</code>
 
