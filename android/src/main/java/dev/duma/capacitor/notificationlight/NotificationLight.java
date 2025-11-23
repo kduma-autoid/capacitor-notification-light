@@ -171,21 +171,19 @@ public class NotificationLight {
                 return false;
             }
 
-            // Create lights request
+            // Create light state
             android.hardware.lights.LightState lightState = new android.hardware.lights.LightState.Builder()
                 .setColor(color)
                 .build();
 
             // Open session and control the LED
-            java.util.Map<android.hardware.lights.Light, android.hardware.lights.LightState> lightsMap = new java.util.HashMap<>();
-            lightsMap.put(notificationLight, lightState);
-
             lightsSession = lightsManager.openSession();
-            lightsSession.requestLights(
-                new android.hardware.lights.LightsRequest.Builder()
-                    .setLights(lightsMap)
-                    .build()
-            );
+
+            // Build the lights request using addLight() method
+            android.hardware.lights.LightsRequest.Builder requestBuilder = new android.hardware.lights.LightsRequest.Builder();
+            requestBuilder.addLight(notificationLight, lightState);
+
+            lightsSession.requestLights(requestBuilder.build());
 
             Logger.info(
                 TAG,
