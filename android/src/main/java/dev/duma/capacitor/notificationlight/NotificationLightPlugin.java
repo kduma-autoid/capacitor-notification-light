@@ -1,6 +1,7 @@
 package dev.duma.capacitor.notificationlight;
 
 import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
@@ -36,8 +37,8 @@ public class NotificationLightPlugin extends Plugin {
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             // Android 13+ requires runtime permission
-            String permissionState = getPermissionState("notifications");
-            permissionsResult.put("display", permissionState);
+            PermissionState permissionState = getPermissionState("notifications");
+            permissionsResult.put("display", permissionState.toString());
         } else {
             // Before Android 13, notification permissions are granted by default
             permissionsResult.put("display", "granted");
@@ -62,8 +63,8 @@ public class NotificationLightPlugin extends Plugin {
     @PermissionCallback
     private void permissionsCallback(PluginCall call) {
         JSObject permissionsResult = new JSObject();
-        String permissionState = getPermissionState("notifications");
-        permissionsResult.put("display", permissionState);
+        PermissionState permissionState = getPermissionState("notifications");
+        permissionsResult.put("display", permissionState.toString());
         call.resolve(permissionsResult);
     }
 
