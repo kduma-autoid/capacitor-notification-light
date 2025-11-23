@@ -14,6 +14,7 @@ export interface LedInfo {
   available: boolean;
   lightsCount?: number;
   lightTypes?: string[];
+  error?: string;
 }
 
 export interface NotificationLightPlugin {

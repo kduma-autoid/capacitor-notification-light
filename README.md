@@ -90,6 +90,7 @@ Echo test method (for development)
 | **`available`**   | <code>boolean</code>  |
 | **`lightsCount`** | <code>number</code>   |
 | **`lightTypes`**  | <code>string[]</code> |
+| **`error`**       | <code>string</code>   |
 
 
 #### LedOptions

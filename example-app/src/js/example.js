@@ -16,8 +16,16 @@ window.checkLedAvailability = async () => {
       statusText += `Light Types: ${result.lightTypes?.join(', ') || 'N/A'}\n`;
       statusText += '\nUsing LightsManager API (Android 12+)';
     } else {
-      statusText += '\nNote: This plugin requires Android 12 (API 31) or higher.\n';
-      statusText += 'Not all devices have notification LEDs.';
+      if (result.error) {
+        statusText += `\n⚠️ ${result.error}\n`;
+        statusText += '\nTo grant permission (requires root/system app):\n';
+        statusText += '1. Install as system app in /system/priv-app/, OR\n';
+        statusText += '2. Sign app with platform certificate, OR\n';
+        statusText += '3. Use emulator with -writable-system flag';
+      } else {
+        statusText += '\nNote: This plugin requires Android 12 (API 31) or higher.\n';
+        statusText += 'Not all devices have notification LEDs.';
+      }
     }
 
     output.textContent = statusText;
