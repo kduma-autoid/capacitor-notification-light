@@ -2,6 +2,18 @@ export interface NotificationLightPlugin {
   echo(options: { value: string }): Promise<{ value: string }>;
 
   /**
+   * Check if notification permissions are granted (Android 13+ only)
+   * @returns Promise with permission status
+   */
+  checkPermissions(): Promise<PermissionStatus>;
+
+  /**
+   * Request notification permissions (Android 13+ only)
+   * @returns Promise with permission status
+   */
+  requestPermissions(): Promise<PermissionStatus>;
+
+  /**
    * Creates a notification channel with LED light configuration and shows a notification
    * @param options Configuration for the notification channel and LED
    */
@@ -17,6 +29,13 @@ export interface NotificationLightPlugin {
    * Clears all notifications created by this plugin
    */
   clearAllNotifications(): Promise<void>;
+}
+
+export interface PermissionStatus {
+  /**
+   * Permission state: 'granted', 'denied', or 'prompt'
+   */
+  display: 'granted' | 'denied' | 'prompt';
 }
 
 export interface NotificationLightOptions {

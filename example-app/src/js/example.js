@@ -1,12 +1,58 @@
 import { NotificationLight } from '@kduma-autoid/capacitor-notification-light';
 
 let lastNotificationId = 0;
+let permissionsGranted = false;
 
 // Helper function to log output
 function logOutput(message) {
     const output = document.getElementById('output');
     const timestamp = new Date().toLocaleTimeString();
     output.textContent = `[${timestamp}] ${message}\n` + output.textContent;
+}
+
+// Request notification permissions on app load
+async function requestNotificationPermissions() {
+    try {
+        const result = await NotificationLight.requestPermissions();
+        if (result.display === 'granted') {
+            permissionsGranted = true;
+            logOutput('✅ Notification permissions granted');
+        } else {
+            logOutput('❌ Notification permissions denied');
+        }
+    } catch (error) {
+        logOutput(`Permission request error: ${error.message}`);
+        // On older Android versions, permissions are granted by default
+        permissionsGranted = true;
+    }
+}
+
+// Check permissions on page load
+async function checkPermissions() {
+    try {
+        const result = await NotificationLight.checkPermissions();
+        if (result.display === 'granted') {
+            permissionsGranted = true;
+            logOutput('✅ Notification permissions already granted');
+        } else {
+            logOutput('⚠️ Requesting notification permissions...');
+            await requestNotificationPermissions();
+        }
+    } catch (error) {
+        logOutput(`Permission check error: ${error.message}`);
+        // On older Android versions, permissions are granted by default
+        permissionsGranted = true;
+    }
+}
+
+// Check permissions when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    checkPermissions();
+});
+
+// Manual permission request function
+window.requestPermissions = async () => {
+    await requestNotificationPermissions();
 }
 
 // Original echo test
@@ -20,8 +66,23 @@ window.testEcho = async () => {
     }
 }
 
+// Helper to check permissions before showing notification
+async function ensurePermissions() {
+    if (!permissionsGranted) {
+        logOutput('⚠️ Requesting permissions first...');
+        await requestNotificationPermissions();
+        if (!permissionsGranted) {
+            logOutput('❌ Cannot show notification: permissions denied');
+            return false;
+        }
+    }
+    return true;
+}
+
 // Show notification with red LED
 window.showRedNotification = async () => {
+    if (!(await ensurePermissions())) return;
+
     try {
         lastNotificationId++;
         await NotificationLight.showNotificationWithLight({
@@ -42,6 +103,8 @@ window.showRedNotification = async () => {
 
 // Show notification with green LED
 window.showGreenNotification = async () => {
+    if (!(await ensurePermissions())) return;
+
     try {
         lastNotificationId++;
         await NotificationLight.showNotificationWithLight({
@@ -62,6 +125,8 @@ window.showGreenNotification = async () => {
 
 // Show notification with blue LED
 window.showBlueNotification = async () => {
+    if (!(await ensurePermissions())) return;
+
     try {
         lastNotificationId++;
         await NotificationLight.showNotificationWithLight({
@@ -82,6 +147,8 @@ window.showBlueNotification = async () => {
 
 // Show notification with custom LED color from form
 window.showCustomNotification = async () => {
+    if (!(await ensurePermissions())) return;
+
     try {
         const title = document.getElementById('notificationTitle').value;
         const body = document.getElementById('notificationBody').value;
