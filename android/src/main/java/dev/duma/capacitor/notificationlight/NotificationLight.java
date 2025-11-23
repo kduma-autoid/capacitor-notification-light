@@ -3,6 +3,7 @@ package dev.duma.capacitor.notificationlight;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
@@ -106,6 +107,76 @@ public class NotificationLight {
     public void clearAllNotifications() {
         notificationManager.cancelAll();
         Logger.info(TAG, "Cleared all notifications");
+    }
+
+    /**
+     * Check if the device supports notification LED
+     *
+     * Note: There is no reliable API to detect LED hardware on Android.
+     * This method provides a best-effort estimate based on:
+     * 1. Checking for known device models/manufacturers that removed LEDs
+     * 2. Android version (newer versions tend to have fewer LEDs)
+     *
+     * The only way to truly know is to test on the actual device.
+     *
+     * @return true if LED might be supported, false if definitely not supported
+     */
+    public boolean isLedSupported() {
+        // Check device manufacturer and model
+        String manufacturer = Build.MANUFACTURER.toLowerCase();
+        String model = Build.MODEL.toLowerCase();
+        int sdkVersion = Build.VERSION.SDK_INT;
+
+        // Google Pixel devices after Pixel 3 don't have notification LEDs
+        if (manufacturer.contains("google")) {
+            if (
+                model.contains("pixel 4") ||
+                model.contains("pixel 5") ||
+                model.contains("pixel 6") ||
+                model.contains("pixel 7") ||
+                model.contains("pixel 8")
+            ) {
+                Logger.info(TAG, "Device is newer Pixel without LED");
+                return false;
+            }
+        }
+
+        // Samsung flagship devices after S9 often don't have LEDs
+        if (manufacturer.contains("samsung")) {
+            if (
+                model.contains("s10") ||
+                model.contains("s20") ||
+                model.contains("s21") ||
+                model.contains("s22") ||
+                model.contains("s23") ||
+                model.contains("s24")
+            ) {
+                Logger.info(TAG, "Device is newer Samsung flagship, likely no LED");
+                return false;
+            }
+        }
+
+        // Most devices before Android 9 (API 28) had LEDs
+        if (sdkVersion < Build.VERSION_CODES.P) {
+            Logger.info(TAG, "Older Android version, likely has LED");
+            return true;
+        }
+
+        // For unknown devices, assume no LED on very new Android versions
+        if (sdkVersion >= Build.VERSION_CODES.S) { // Android 12+
+            Logger.info(
+                TAG,
+                "Unknown device on Android 12+, LED support uncertain"
+            );
+            return false;
+        }
+
+        // Default to "might have LED" for other cases
+        Logger.info(
+            TAG,
+            "LED support uncertain for device: " + manufacturer + " " + model
+        );
+        return true;
     }
 
     /**

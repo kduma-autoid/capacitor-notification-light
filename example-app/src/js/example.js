@@ -55,6 +55,20 @@ window.requestPermissions = async () => {
     await requestNotificationPermissions();
 }
 
+// Check if device supports LED
+window.checkLedSupport = async () => {
+    try {
+        const result = await NotificationLight.isLedSupported();
+        if (result.supported) {
+            logOutput('✅ Device likely supports notification LED');
+        } else {
+            logOutput('❌ Device likely does NOT support notification LED (or manufacturer removed it)');
+        }
+    } catch (error) {
+        logOutput(`LED support check error: ${error.message}`);
+    }
+}
+
 // Original echo test
 window.testEcho = async () => {
     try {

@@ -53,6 +53,14 @@ await NotificationLight.cancelNotification({
 
 // Clear all notifications
 await NotificationLight.clearAllNotifications();
+
+// Check if device supports LED (best-effort detection)
+const { supported } = await NotificationLight.isLedSupported();
+if (supported) {
+  console.log('Device likely has LED support');
+} else {
+  console.log('Device likely does NOT have LED support');
+}
 ```
 
 ## Example App
@@ -138,9 +146,12 @@ You can use any hex color, but device hardware may limit the actual colors displ
 <docgen-index>
 
 * [`echo(...)`](#echo)
+* [`checkPermissions()`](#checkpermissions)
+* [`requestPermissions()`](#requestpermissions)
 * [`showNotificationWithLight(...)`](#shownotificationwithlight)
 * [`cancelNotification(...)`](#cancelnotification)
 * [`clearAllNotifications()`](#clearallnotifications)
+* [`isLedSupported()`](#isledsupported)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -200,6 +211,21 @@ clearAllNotifications() => Promise<void>
 ```
 
 Clears all notifications created by this plugin
+
+--------------------
+
+
+### isLedSupported()
+
+```typescript
+isLedSupported() => Promise<{ supported: boolean }>
+```
+
+Check if the device supports notification LED
+
+**Important:** There is no reliable Android API to detect LED hardware. This method provides a best-effort estimate based on device manufacturer, model, and Android version. The result should be treated as a hint, not a guarantee.
+
+**Returns:** <code>Promise&lt;{ supported: boolean }&gt;</code>
 
 --------------------
 

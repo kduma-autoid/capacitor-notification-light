@@ -27,4 +27,9 @@ export class NotificationLightWeb extends WebPlugin implements NotificationLight
   async clearAllNotifications(): Promise<void> {
     throw this.unimplemented('Notification clearing is only available on Android devices');
   }
+
+  async isLedSupported(): Promise<{ supported: boolean }> {
+    // Web doesn't have LED support
+    return { supported: false };
+  }
 }

@@ -29,6 +29,12 @@ export interface NotificationLightPlugin {
    * Clears all notifications created by this plugin
    */
   clearAllNotifications(): Promise<void>;
+
+  /**
+   * Check if the device supports notification LED
+   * @returns Promise with LED support status
+   */
+  isLedSupported(): Promise<{ supported: boolean }>;
 }
 
 export interface PermissionStatus {

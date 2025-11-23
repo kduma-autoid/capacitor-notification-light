@@ -88,4 +88,16 @@ public class NotificationLightPlugin extends Plugin {
             call.reject("Failed to clear notifications", e);
         }
     }
+
+    @PluginMethod
+    public void isLedSupported(PluginCall call) {
+        try {
+            boolean supported = implementation.isLedSupported();
+            JSObject ret = new JSObject();
+            ret.put("supported", supported);
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject("Failed to check LED support", e);
+        }
+    }
 }
