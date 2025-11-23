@@ -137,6 +137,7 @@ echo(options: { value: string; }) => Promise<{ value: string; }>
 
 --------------------
 
+
 ### showNotificationWithLight(...)
 
 ```typescript
@@ -145,11 +146,12 @@ showNotificationWithLight(options: NotificationLightOptions) => Promise<void>
 
 Creates a notification channel with LED light configuration and shows a notification
 
-| Param         | Type                                                                      |
-| ------------- | ------------------------------------------------------------------------- |
-| **`options`** | <code><a href="#notificationlightoptions">NotificationLightOptions</a></code> |
+| Param         | Type                                                                          | Description                                        |
+| ------------- | ----------------------------------------------------------------------------- | -------------------------------------------------- |
+| **`options`** | <code><a href="#notificationlightoptions">NotificationLightOptions</a></code> | Configuration for the notification channel and LED |
 
 --------------------
+
 
 ### cancelNotification(...)
 
@@ -159,11 +161,12 @@ cancelNotification(options: { notificationId: number; }) => Promise<void>
 
 Cancels/removes a notification by its ID
 
-| Param         | Type                                     |
-| ------------- | ---------------------------------------- |
-| **`options`** | <code>{ notificationId: number; }</code> |
+| Param         | Type                                     | Description                   |
+| ------------- | ---------------------------------------- | ----------------------------- |
+| **`options`** | <code>{ notificationId: number; }</code> | The notification ID to cancel |
 
 --------------------
+
 
 ### clearAllNotifications()
 
@@ -175,19 +178,21 @@ Clears all notifications created by this plugin
 
 --------------------
 
+
 ### Interfaces
+
 
 #### NotificationLightOptions
 
-| Prop              | Type                | Description                                                                 |
-| ----------------- | ------------------- | --------------------------------------------------------------------------- |
-| **`channelId`**   | <code>string</code> | Unique identifier for the notification channel                              |
-| **`channelName`** | <code>string</code> | Display name for the notification channel                                   |
-| **`notificationId`** | <code>number</code> | Notification ID (for canceling later)                                    |
-| **`title`**       | <code>string</code> | Title of the notification                                                   |
-| **`body`**        | <code>string</code> | Body text of the notification                                               |
-| **`lightColor`**  | <code>string</code> | LED light color in hex format (e.g., "#FF0000" for red)                    |
-| **`lightOnMs`**   | <code>number</code> | LED on duration in milliseconds (default: 1000)                             |
-| **`lightOffMs`**  | <code>number</code> | LED off duration in milliseconds (default: 3000)                            |
+| Prop                 | Type                | Description                                                                                      |
+| -------------------- | ------------------- | ------------------------------------------------------------------------------------------------ |
+| **`channelId`**      | <code>string</code> | Unique identifier for the notification channel                                                   |
+| **`channelName`**    | <code>string</code> | Display name for the notification channel                                                        |
+| **`notificationId`** | <code>number</code> | Notification ID (for canceling later)                                                            |
+| **`title`**          | <code>string</code> | Title of the notification                                                                        |
+| **`body`**           | <code>string</code> | Body text of the notification                                                                    |
+| **`lightColor`**     | <code>string</code> | LED light color in hex format (e.g., "#FF0000" for red, "#00FF00" for green, "#0000FF" for blue) |
+| **`lightOnMs`**      | <code>number</code> | LED on duration in milliseconds (default: 1000)                                                  |
+| **`lightOffMs`**     | <code>number</code> | LED off duration in milliseconds (default: 3000)                                                 |
 
 </docgen-api>
