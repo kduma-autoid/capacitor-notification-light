@@ -9,13 +9,16 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import com.getcapacitor.Logger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationLight {
 
     private static final String TAG = "NotificationLight";
     private Context context;
     private NotificationManager notificationManager;
+    private android.hardware.lights.LightsManager.LightsSession lightsSession;
 
     public NotificationLight(Context context) {
         this.context = context;
@@ -30,6 +33,9 @@ public class NotificationLight {
 
     /**
      * Creates a notification channel with LED configuration and shows a notification
+     *
+     * On Android 12+ (API 31+): Uses LightsManager API for direct LED control
+     * On older versions: Uses notification channels with LED settings
      */
     public void showNotificationWithLight(
         String channelId,
@@ -41,6 +47,30 @@ public class NotificationLight {
         int lightOnMs,
         int lightOffMs
     ) {
+        int color = parseColor(lightColor);
+
+        // Android 12+ (API 31+): Use LightsManager API for direct LED control
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            boolean ledControlled = controlLedWithLightsManager(
+                color,
+                lightOnMs,
+                lightOffMs
+            );
+            if (ledControlled) {
+                Logger.info(
+                    TAG,
+                    "LED controlled directly via LightsManager API with color: " +
+                    lightColor
+                );
+            } else {
+                Logger.warn(
+                    TAG,
+                    "LightsManager LED control failed, falling back to notification method"
+                );
+            }
+        }
+
+        // Create notification (required for Android 8+ and for Android 12+ fallback)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create notification channel with LED settings
             // IMPORTANT: LED requires at least IMPORTANCE_HIGH to work
@@ -52,12 +82,9 @@ public class NotificationLight {
 
             // Enable LED lights on the channel
             channel.enableLights(true);
-
-            // Set LED color (parse hex color string)
-            int color = parseColor(lightColor);
             channel.setLightColor(color);
 
-            // Enable sound (some devices require this for LED to work)
+            // Disable sound/vibration
             channel.enableVibration(false);
             channel.setSound(null, null);
 
@@ -87,7 +114,6 @@ public class NotificationLight {
 
         // For devices below Android O, set LED on the notification itself
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            int color = parseColor(lightColor);
             builder.setLights(color, lightOnMs, lightOffMs);
         }
 
@@ -96,18 +122,120 @@ public class NotificationLight {
     }
 
     /**
-     * Cancels a notification by its ID
+     * Control LED directly using LightsManager API (Android 12+)
+     * @return true if LED was successfully controlled, false otherwise
+     */
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private boolean controlLedWithLightsManager(
+        int color,
+        int lightOnMs,
+        int lightOffMs
+    ) {
+        try {
+            // Close any existing session
+            if (lightsSession != null) {
+                lightsSession.close();
+                lightsSession = null;
+            }
+
+            android.hardware.lights.LightsManager lightsManager = context.getSystemService(
+                android.hardware.lights.LightsManager.class
+            );
+
+            if (lightsManager == null) {
+                Logger.warn(TAG, "LightsManager not available");
+                return false;
+            }
+
+            // Find notification LED
+            List<android.hardware.lights.Light> lights = lightsManager.getLights();
+            android.hardware.lights.Light notificationLight = null;
+
+            for (android.hardware.lights.Light light : lights) {
+                if (light.getType() == 3) { // LIGHT_TYPE_NOTIFICATION
+                    notificationLight = light;
+                    Logger.info(
+                        TAG,
+                        "Found notification LED: " +
+                        light.getName() +
+                        " (ID: " +
+                        light.getId() +
+                        ")"
+                    );
+                    break;
+                }
+            }
+
+            if (notificationLight == null) {
+                Logger.warn(TAG, "No notification LED found");
+                return false;
+            }
+
+            // Create lights request
+            android.hardware.lights.LightState lightState = new android.hardware.lights.LightState.Builder()
+                .setColor(color)
+                .build();
+
+            // Open session and control the LED
+            java.util.Map<android.hardware.lights.Light, android.hardware.lights.LightState> lightsMap = new java.util.HashMap<>();
+            lightsMap.put(notificationLight, lightState);
+
+            lightsSession = lightsManager.openSession();
+            lightsSession.requestLights(
+                new android.hardware.lights.LightsRequest.Builder()
+                    .setLights(lightsMap)
+                    .build()
+            );
+
+            Logger.info(
+                TAG,
+                "LED controlled successfully with color: " +
+                String.format("#%06X", (0xFFFFFF & color))
+            );
+            return true;
+        } catch (Exception e) {
+            Logger.error(TAG, "Error controlling LED with LightsManager", e);
+            return false;
+        }
+    }
+
+    /**
+     * Cancels a notification by its ID and turns off LED
      */
     public void cancelNotification(int notificationId) {
         notificationManager.cancel(notificationId);
+
+        // Turn off LED if using LightsManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && lightsSession != null) {
+            try {
+                lightsSession.close();
+                lightsSession = null;
+                Logger.info(TAG, "LED turned off via LightsManager");
+            } catch (Exception e) {
+                Logger.error(TAG, "Error turning off LED", e);
+            }
+        }
+
         Logger.info(TAG, "Cancelled notification with ID: " + notificationId);
     }
 
     /**
-     * Clears all notifications
+     * Clears all notifications and turns off LED
      */
     public void clearAllNotifications() {
         notificationManager.cancelAll();
+
+        // Turn off LED if using LightsManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && lightsSession != null) {
+            try {
+                lightsSession.close();
+                lightsSession = null;
+                Logger.info(TAG, "LED turned off via LightsManager");
+            } catch (Exception e) {
+                Logger.error(TAG, "Error turning off LED", e);
+            }
+        }
+
         Logger.info(TAG, "Cleared all notifications");
     }
 

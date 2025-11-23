@@ -82,28 +82,42 @@ The example app provides:
 
 ## How It Works
 
-This plugin uses Android Notification Channels (API level 26+) to control the LED:
+This plugin uses different approaches depending on Android version:
+
+### Android 12+ (API 31+) - Direct LED Control
+Uses the `LightsManager` API for direct hardware control:
 
 ```java
-NotificationChannel channel = new NotificationChannel(
-    channelId,
-    channelName,
-    NotificationManager.IMPORTANCE_DEFAULT
-);
+LightsManager lightsManager = context.getSystemService(LightsManager.class);
+Light notificationLight = // find LED with type LIGHT_TYPE_NOTIFICATION
+LightState lightState = new LightState.Builder().setColor(color).build();
+lightsSession = lightsManager.openSession();
+lightsSession.requestLights(new LightsRequest.Builder().setLights(Map.of(notificationLight, lightState)).build());
+```
+
+This provides **direct hardware control** without relying on notification importance levels.
+
+### Android 8-11 (API 26-30) - Notification Channels
+Uses Notification Channels with LED settings:
+
+```java
+NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
 channel.enableLights(true);
 channel.setLightColor(Color.BLUE);
 notificationManager.createNotificationChannel(channel);
 ```
 
-For devices below Android O (API level 26), the plugin falls back to the legacy notification LED API.
+### Android 7 and below (API 25-) - Legacy API
+Uses the legacy notification LED API directly on notifications.
 
 ## Important Notes
 
 - **Hardware Support**: LED functionality depends on device hardware. Many modern devices (especially flagship phones) have removed the notification LED.
-- **Android Version**: Notification Channels are supported on Android 8.0 (API level 26) and above. Legacy LED API is used for older versions.
-- **Channel Configuration**: Once a notification channel is created, its LED settings are cached. To change LED settings, you must use a different channel ID or clear the app data.
+- **Android 12+ Direct Control**: On Android 12+, the plugin uses the `LightsManager` API for direct LED hardware control, bypassing notification importance restrictions.
+- **Android 8-11**: Uses Notification Channels with `IMPORTANCE_HIGH` which is required for LED to work.
+- **Channel Configuration**: On Android 8-11, once a notification channel is created, its LED settings are cached. To change LED settings, use a different channel ID or clear app data.
 - **Permissions**: The plugin requires notification permissions on Android 13+ (automatically handled by Capacitor).
-- **Importance Level**: The plugin uses `IMPORTANCE_HIGH` which is required for LED to work on Android 8.0+.
+- **LED Control**: On Android 12+, the LED is controlled directly and will turn off when you cancel notifications or clear all notifications.
 
 ## Troubleshooting
 
