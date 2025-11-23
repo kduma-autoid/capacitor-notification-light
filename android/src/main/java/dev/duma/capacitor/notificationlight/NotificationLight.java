@@ -53,17 +53,23 @@ public class NotificationLight {
             return result;
         }
 
-        List<Light> lights = lightsManager.getLights();
-        result.put("available", !lights.isEmpty());
-        result.put("lightsCount", lights.size());
+        try {
+            List<Light> lights = lightsManager.getLights();
+            result.put("available", !lights.isEmpty());
+            result.put("lightsCount", lights.size());
 
-        JSONArray lightTypes = new JSONArray();
-        for (Light light : lights) {
-            String type = getLightTypeName(light.getType());
-            lightTypes.put(type);
-            Logger.info(TAG, "Found light - ID: " + light.getId() + ", Type: " + type);
+            JSONArray lightTypes = new JSONArray();
+            for (Light light : lights) {
+                String type = getLightTypeName(light.getType());
+                lightTypes.put(type);
+                Logger.info(TAG, "Found light - ID: " + light.getId() + ", Type: " + type);
+            }
+            result.put("lightTypes", lightTypes);
+        } catch (SecurityException e) {
+            result.put("available", false);
+            result.put("error", "Permission denied: CONTROL_DEVICE_LIGHTS permission required");
+            Logger.error(TAG, "Permission denied: " + e.getMessage(), e);
         }
-        result.put("lightTypes", lightTypes);
 
         return result;
     }
