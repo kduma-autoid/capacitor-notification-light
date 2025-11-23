@@ -11,14 +11,71 @@
   </head>
   <body>
     <main>
-      <h1>Capacitor Test Plugin Project</h1>
+      <h1>Notification Light Plugin Demo</h1>
       <p>
-        This project can be used to test out the functionality of your plugin. Nothing in the
-        <em>example-app/</em> folder will be published to npm when using this template, so you can create away!
+        This demo shows how to control the Android notification LED using Notification Channels.
       </p>
-      <label for="echoInput">Echo Text:</label>
-      <input type="text" id="echoInput" name="echoInput" value="Hello World!" />
-      <button onclick="testEcho()">Click Me!</button>
+
+      <section style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; background: #fff3cd;">
+        <h2>⚠️ Permissions & Device Support</h2>
+        <p>Android 13+ requires notification permissions. Click the button below if permissions were not auto-requested.</p>
+        <button onclick="requestPermissions()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; margin-right: 10px;">Request Permissions</button>
+        <button onclick="checkLedSupport()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px;">Check LED Support</button>
+      </section>
+
+      <section style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+        <h2>Echo Test (Original)</h2>
+        <label for="echoInput">Echo Text:</label>
+        <input type="text" id="echoInput" name="echoInput" value="Hello World!" />
+        <button onclick="testEcho()">Test Echo</button>
+      </section>
+
+      <section style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+        <h2>LED Notification Control</h2>
+
+        <div style="margin: 10px 0;">
+          <h3>Show Notification with LED Light</h3>
+
+          <div style="margin: 5px 0;">
+            <label for="notificationTitle">Title:</label>
+            <input type="text" id="notificationTitle" value="Test Notification" style="width: 200px;" />
+          </div>
+
+          <div style="margin: 5px 0;">
+            <label for="notificationBody">Body:</label>
+            <input type="text" id="notificationBody" value="This notification has an LED light" style="width: 200px;" />
+          </div>
+
+          <div style="margin: 5px 0;">
+            <label for="ledColor">LED Color:</label>
+            <select id="ledColor">
+              <option value="#FF0000">Red</option>
+              <option value="#00FF00">Green</option>
+              <option value="#0000FF">Blue</option>
+              <option value="#FFFF00">Yellow</option>
+              <option value="#FF00FF">Magenta</option>
+              <option value="#00FFFF">Cyan</option>
+              <option value="#FFFFFF">White</option>
+            </select>
+          </div>
+
+          <button onclick="showRedNotification()" style="margin: 5px; background: #ff4444; color: white; padding: 10px 20px;">Red LED</button>
+          <button onclick="showGreenNotification()" style="margin: 5px; background: #44ff44; color: black; padding: 10px 20px;">Green LED</button>
+          <button onclick="showBlueNotification()" style="margin: 5px; background: #4444ff; color: white; padding: 10px 20px;">Blue LED</button>
+          <button onclick="showCustomNotification()" style="margin: 5px; background: #666; color: white; padding: 10px 20px;">Custom LED</button>
+        </div>
+
+        <div style="margin: 20px 0;">
+          <h3>Clear Notifications</h3>
+          <button onclick="cancelNotification()" style="margin: 5px; padding: 10px 20px;">Cancel Last Notification</button>
+          <button onclick="clearAll()" style="margin: 5px; padding: 10px 20px;">Clear All</button>
+        </div>
+      </section>
+
+      <section style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+        <h3>Output:</h3>
+        <pre id="output" style="background: #f4f4f4; padding: 10px; border-radius: 3px; min-height: 50px;"></pre>
+      </section>
     </main>
 
     <script src="./js/example.js" type="module"></script>
