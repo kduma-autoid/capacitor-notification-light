@@ -6,6 +6,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
 
 @CapacitorPlugin(
     name = "NotificationLight",
@@ -27,6 +28,43 @@ public class NotificationLightPlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("value", implementation.echo(value));
         call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void checkPermissions(PluginCall call) {
+        JSObject permissionsResult = new JSObject();
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ requires runtime permission
+            String permissionState = getPermissionState("notifications");
+            permissionsResult.put("display", permissionState);
+        } else {
+            // Before Android 13, notification permissions are granted by default
+            permissionsResult.put("display", "granted");
+        }
+
+        call.resolve(permissionsResult);
+    }
+
+    @PluginMethod
+    public void requestPermissions(PluginCall call) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ requires runtime permission request
+            requestPermissionForAlias("notifications", call, "permissionsCallback");
+        } else {
+            // Before Android 13, permissions are granted by default
+            JSObject result = new JSObject();
+            result.put("display", "granted");
+            call.resolve(result);
+        }
+    }
+
+    @PermissionCallback
+    private void permissionsCallback(PluginCall call) {
+        JSObject permissionsResult = new JSObject();
+        String permissionState = getPermissionState("notifications");
+        permissionsResult.put("display", permissionState);
+        call.resolve(permissionsResult);
     }
 
     @PluginMethod
